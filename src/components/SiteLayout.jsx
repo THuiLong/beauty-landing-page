@@ -1,4 +1,5 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
+import { JumpToTopButton, ScrollReveal } from './landing/Primitives.jsx'
 
 function PageChip({ page, index }) {
   return (
@@ -22,49 +23,52 @@ function PageChip({ page, index }) {
 
 export function SiteLayout({ pages }) {
   return (
-    <div className="site-shell">
-      <header className="site-header">
-        <div className="site-header__inner site-header__bar">
-          <Link className="brand-lockup" to="/">
-            <span className="brand-lockup__eyebrow">Multi-Concept Demo</span>
-            <span className="brand-lockup__name">Beauty Landing Page Studio</span>
-          </Link>
-          <div className="site-header__note">
-            Ten switchable, sale-ready landing page concepts built for hot niches:
-            premium service brands, wellness products, local businesses, and AI offers.
-          </div>
-        </div>
-      </header>
-
-      <section className="site-switcher-band" aria-label="Landing page switcher area">
-        <div className="site-header__inner">
-          <div className="page-switcher-shell">
-            <div className="page-switcher__intro">
-              <div className="page-switcher__eyebrow">Explore Concepts</div>
-              <p>Jump between niches with a cleaner, more visual selector.</p>
+    <>
+      <div className="site-shell">
+        <header className="site-header">
+          <div className="site-header__inner site-header__bar">
+            <Link className="brand-lockup" to="/">
+              <span className="brand-lockup__eyebrow">Multi-Concept Demo</span>
+              <span className="brand-lockup__name">Beauty Landing Page Studio</span>
+            </Link>
+            <div className="site-header__note">
+              Ten switchable, sale-ready landing page concepts built for hot niches:
+              premium service brands, wellness products, local businesses, and AI offers.
             </div>
-            <nav className="page-switcher" aria-label="Landing page switcher">
-              {pages.map((page, index) => (
-                <PageChip key={page.slug} page={page} index={index} />
-              ))}
-            </nav>
           </div>
-        </div>
-      </section>
+        </header>
 
-      <main className="page-main">
-        <div className="page-wrap">
-          <Outlet />
-        </div>
-      </main>
-    </div>
+        <section className="site-switcher-band" aria-label="Landing page switcher area">
+          <div className="site-header__inner">
+            <div className="page-switcher-shell">
+              <div className="page-switcher__intro">
+                <div className="page-switcher__eyebrow">Explore Concepts</div>
+                <p>Jump between niches with a cleaner, more visual selector.</p>
+              </div>
+              <nav className="page-switcher" aria-label="Landing page switcher">
+                {pages.map((page, index) => (
+                  <PageChip key={page.slug} page={page} index={index} />
+                ))}
+              </nav>
+            </div>
+          </div>
+        </section>
+
+        <main className="page-main">
+          <div className="page-wrap">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+      <JumpToTopButton />
+    </>
   )
 }
 
 export function DemoHome({ pages }) {
   return (
     <>
-      <section className="home-hero">
+      <ScrollReveal as="section" className="home-hero" variant="top">
         <div className="home-hero__grid">
           <div>
             <div className="page-eyebrow">Portfolio Collection</div>
@@ -99,9 +103,9 @@ export function DemoHome({ pages }) {
             </div>
           </aside>
         </div>
-      </section>
+      </ScrollReveal>
 
-      <section id="demo-grid" className="home-grid">
+      <ScrollReveal as="section" id="demo-grid" className="home-grid" delay={90} variant="up">
         {pages.map((page) => (
           <Link
             key={page.slug}
@@ -120,7 +124,7 @@ export function DemoHome({ pages }) {
             </div>
           </Link>
         ))}
-      </section>
+      </ScrollReveal>
     </>
   )
 }

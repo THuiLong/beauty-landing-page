@@ -9,6 +9,7 @@ import {
   ShowcaseGrid,
   StepsGrid,
 } from '../components/landing/Primitives'
+import { CountUpText } from '../components/landing/CountUpText'
 import { AIAgencyVisual } from '../components/landing/HeroVisuals.jsx'
 
 const theme = {
@@ -298,7 +299,7 @@ function AIAutomationAgencyPage() {
           <div style={commandCenterStyle}>
             {outcomeCards.map((item) => (
               <article key={item.label} style={outcomeCardStyle}>
-                <strong style={outcomeValueStyle}>{item.value}</strong>
+                <strong style={outcomeValueStyle}><CountUpText value={item.value} /></strong>
                 <span style={{ color: 'rgba(239, 251, 255, 0.76)', lineHeight: 1.55 }}>{item.label}</span>
               </article>
             ))}

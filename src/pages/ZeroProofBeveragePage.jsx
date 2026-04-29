@@ -7,6 +7,7 @@ import {
   QuoteGrid,
   Section,
   ShowcaseGrid,
+  ScrollReveal,
   StepsGrid,
 } from '../components/landing/Primitives.jsx'
 import { ZeroProofVisual } from '../components/landing/HeroVisuals.jsx'
@@ -505,7 +506,7 @@ function ZeroProofBeveragePage() {
         spotlight={spotlight}
       >
         <div className="zero-proof-page">
-          <section className="zero-proof-shelf" aria-label="Brand positioning">
+          <ScrollReveal as="section" className="zero-proof-shelf" aria-label="Brand positioning" variant="right">
             <div className="zero-proof-shelf__lead">
               <span className="zero-proof-shelf__kicker">Trend-driven CPG energy</span>
               <h2>Designed like the can you bring to the party and leave on the moodboard.</h2>
@@ -534,7 +535,7 @@ function ZeroProofBeveragePage() {
                 </article>
               ))}
             </div>
-          </section>
+          </ScrollReveal>
 
           <div id="flavors">
             <Section

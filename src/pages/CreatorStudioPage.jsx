@@ -7,8 +7,10 @@ import {
   QuoteGrid,
   Section,
   ShowcaseGrid,
+  ScrollReveal,
   StepsGrid,
 } from '../components/landing/Primitives'
+import { CountUpText } from '../components/landing/CountUpText'
 import { CreatorStudioVisual } from '../components/landing/HeroVisuals.jsx'
 
 const theme = {
@@ -518,7 +520,7 @@ function CreatorStudioPage() {
         ]}
       >
         <div className="creator-studio-page">
-          <section className="creator-studio-pulse" aria-label="Studio positioning">
+          <ScrollReveal as="section" className="creator-studio-pulse" aria-label="Studio positioning" variant="left">
             <div className="creator-studio-pulse__lead">
               <span className="creator-studio-pulse__kicker">High-energy brand storytelling</span>
               <h2>Fashion-campaign polish meets creator-speed execution.</h2>
@@ -550,7 +552,7 @@ function CreatorStudioPage() {
                 <span>Every concept ties back to a launch, offer, audience objection, or trust trigger.</span>
               </div>
             </div>
-          </section>
+          </ScrollReveal>
 
           <Section
             eyebrow="Service Offers"
@@ -587,7 +589,7 @@ function CreatorStudioPage() {
                   <div className="creator-studio-post__format">{post.format}</div>
                   <h3>{post.title}</h3>
                   <p>{post.detail}</p>
-                  <div className="creator-studio-post__stat">{post.stat}</div>
+                  <div className="creator-studio-post__stat"><CountUpText value={post.stat} /></div>
                 </article>
               ))}
             </div>

@@ -29,6 +29,9 @@ const theme = {
   'cta-gradient': 'linear-gradient(135deg, #4b644a, #8e684b)',
   'cta-text': '#f8f4ee',
   'page-heading-font': "'Fraunces', 'Georgia', serif",
+  'page-title-max-width': '14.5ch',
+  'page-title-size': 'clamp(2.5rem, 5vw, 4.8rem)',
+  'section-title-max-width': '19ch',
   'page-pattern':
     'radial-gradient(circle at 18% 18%, rgba(255,255,255,0.3) 0, transparent 18%), linear-gradient(135deg, rgba(75,100,74,0.08), transparent 34%), linear-gradient(0deg, rgba(141,114,86,0.05), rgba(141,114,86,0.05))',
 }

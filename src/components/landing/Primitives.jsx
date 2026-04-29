@@ -1,4 +1,5 @@
-import { Children, isValidElement } from 'react'
+import { Children, isValidElement, useEffect, useRef, useState } from 'react'
+import { CountUpText } from './CountUpText'
 
 export function PageFrame({
   theme,
@@ -18,6 +19,7 @@ export function PageFrame({
       ...(spotlight?.slice(0, 2).map((item) => item.title) ?? []),
       ...(metrics.slice(0, 1).map((metric) => metric.value) ?? []),
     ]
+  const trustItems = deriveTrustItems(metrics, spotlight)
   const readingPath = deriveReadingPath(children)
 
   return (
@@ -39,6 +41,16 @@ export function PageFrame({
               </a>
             ) : null}
           </div>
+          {trustItems.length ? (
+            <div className="hero-proof-strip" aria-label="Key trust signals">
+              {trustItems.map((item) => (
+                <div className="hero-proof-chip" key={item.label}>
+                  <strong><CountUpText value={item.value} /></strong>
+                  <span>{item.label}</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
           {readingPath.length ? (
             <nav className="hero-guide" aria-label="Suggested reading order">
               <div className="hero-guide__eyebrow">Start Here</div>
@@ -73,7 +85,7 @@ export function PageFrame({
             <div className="metrics-grid">
               {metrics.map((metric) => (
                 <div className="metric-card" key={metric.label}>
-                  <strong>{metric.value}</strong>
+                  <strong><CountUpText value={metric.value} /></strong>
                   <span>{metric.label}</span>
                 </div>
               ))}
@@ -97,7 +109,7 @@ export function PageFrame({
               <div className="hero-badge-row">
                 {heroBadges.map((badge) => (
                   <span className="hero-pill" key={badge}>
-                    {badge}
+                    <CountUpText value={badge} />
                   </span>
                 ))}
               </div>
@@ -112,9 +124,121 @@ export function PageFrame({
           ))}
         </div>
       </header>
-
       {children}
     </article>
+  )
+}
+
+export function JumpToTopButton({
+  label = 'Back to top',
+}) {
+  const getIsVisible = () => {
+    if (typeof window === 'undefined') {
+      return false
+    }
+
+    const scrollRoot = document.documentElement
+    const maxScroll = Math.max(scrollRoot.scrollHeight - window.innerHeight, 0)
+
+    return maxScroll > 0 && window.scrollY >= maxScroll / 2
+  }
+
+  const [isVisible, setIsVisible] = useState(getIsVisible)
+
+  useEffect(() => {
+    const updateVisibility = () => {
+      setIsVisible(getIsVisible())
+    }
+
+    window.addEventListener('scroll', updateVisibility, { passive: true })
+    window.addEventListener('resize', updateVisibility)
+
+    return () => {
+      window.removeEventListener('scroll', updateVisibility)
+      window.removeEventListener('resize', updateVisibility)
+    }
+  }, [])
+
+  const handleClick = () => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    window.scrollTo({
+      top: 0,
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+    })
+  }
+
+  return (
+    <button
+      type="button"
+      className={`jump-to-top${isVisible ? ' is-visible' : ''}`}
+      onClick={handleClick}
+      aria-label={label}
+    >
+      <span aria-hidden="true">&uarr;</span>
+      <span>{label}</span>
+    </button>
+  )
+}
+
+export function ScrollReveal({
+  as: Tag = 'div',
+  className = '',
+  children,
+  delay = 0,
+  variant = 'up',
+  rootMargin = '0px 0px -12% 0px',
+  threshold = 0.18,
+  style,
+  ...props
+}) {
+  const elementRef = useRef(null)
+  const [isVisible, setIsVisible] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false
+    }
+
+    return (
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      typeof window.IntersectionObserver !== 'function'
+    )
+  })
+
+  useEffect(() => {
+    const node = elementRef.current
+
+    if (!node || isVisible) {
+      return undefined
+    }
+
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) {
+          return
+        }
+
+        setIsVisible(true)
+        observer.unobserve(entry.target)
+      },
+      { rootMargin, threshold },
+    )
+
+    observer.observe(node)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [isVisible, rootMargin, threshold])
+
+  return (
+    <Tag
+      ref={elementRef}
+      className={`scroll-reveal scroll-reveal--${variant}${isVisible ? ' is-visible' : ''}${className ? ` ${className}` : ''}`}
+      style={delay ? { ...style, '--reveal-delay': `${delay}ms` } : style}
+      {...props}
+    >
+      {children}
+    </Tag>
   )
 }
 
@@ -132,7 +256,7 @@ function DefaultHeroVisual({ eyebrow, metrics, spotlight }) {
           <div className="hero-visual__grid">
             {visualMetrics.map((metric) => (
               <div className="hero-visual__metric" key={metric.label}>
-                <strong>{metric.value}</strong>
+                <strong><CountUpText value={metric.value} /></strong>
                 <span>{metric.label}</span>
               </div>
             ))}
@@ -152,24 +276,37 @@ function DefaultHeroVisual({ eyebrow, metrics, spotlight }) {
   )
 }
 
-export function Section({ eyebrow, title, description, children }) {
+export function Section({ eyebrow, title, description, children, className = '', ...props }) {
+  const variant = getRevealVariant({
+    eyebrow,
+    title,
+    className,
+  })
+
   return (
-    <section className="page-section">
+    <ScrollReveal
+      as="section"
+      className={`page-section${className ? ` ${className}` : ''}`}
+      variant={variant}
+      {...props}
+    >
       <div className="section-head">
-        {eyebrow ? <div className="section-eyebrow">{eyebrow}</div> : null}
-        {title ? <h2 className="section-title">{title}</h2> : null}
+        <div className="section-head__main">
+          {eyebrow ? <div className="section-eyebrow">{eyebrow}</div> : null}
+          {title ? <h2 className="section-title">{title}</h2> : null}
+        </div>
         {description ? <p className="section-description">{description}</p> : null}
       </div>
       {children}
-    </section>
+    </ScrollReveal>
   )
 }
 
 export function CardGrid({ items }) {
   return (
     <div className="card-grid">
-      {items.map((item) => (
-        <article className="card" key={item.title}>
+      {items.map((item, index) => (
+        <article className={`card card--${index % 4 === 0 ? 'featured' : 'default'}`} key={item.title}>
           {item.eyebrow ? <div className="card-eyebrow">{item.eyebrow}</div> : null}
           <h3 className="card-title">{item.title}</h3>
           <p className="card-text">{item.text}</p>
@@ -190,7 +327,7 @@ export function StepsGrid({ items }) {
   return (
     <div className="steps-grid">
       {items.map((item, index) => (
-        <article className="step-card" key={item.title}>
+        <article className={`step-card step-card--${index === 1 ? 'accent' : 'default'}`} key={item.title}>
           <span className="step-number">{String(index + 1).padStart(2, '0')}</span>
           <h3 className="card-title">{item.title}</h3>
           <p className="card-text">{item.text}</p>
@@ -227,8 +364,8 @@ export function ShowcaseGrid({ items }) {
 export function QuoteGrid({ items }) {
   return (
     <div className="quote-grid">
-      {items.map((item) => (
-        <article className="quote-card" key={item.author}>
+      {items.map((item, index) => (
+        <article className={`quote-card${index === 0 ? ' quote-card--featured' : ''}`} key={item.author}>
           <p>{item.quote}</p>
           <div className="quote-card__author">{item.author}</div>
           <div className="card-text">{item.role}</div>
@@ -241,8 +378,8 @@ export function QuoteGrid({ items }) {
 export function PricingGrid({ items }) {
   return (
     <div className="pricing-grid">
-      {items.map((item) => (
-        <article className="pricing-card" key={item.title}>
+      {items.map((item, index) => (
+        <article className={`pricing-card${index === 1 ? ' pricing-card--featured' : ''}`} key={item.title}>
           <div className="card-eyebrow">{item.eyebrow}</div>
           <h3>{item.title}</h3>
           <div className="price-tag">{item.price}</div>
@@ -273,7 +410,7 @@ export function FaqGrid({ items }) {
 
 export function CtaBanner({ title, text, primaryCta, secondaryCta }) {
   return (
-    <section className="cta-banner">
+    <ScrollReveal as="section" className="cta-banner" variant="top">
       <h2 className="cta-banner__title">{title}</h2>
       <p>{text}</p>
       <div className="cta-row">
@@ -288,7 +425,7 @@ export function CtaBanner({ title, text, primaryCta, secondaryCta }) {
           </a>
         ) : null}
       </div>
-    </section>
+    </ScrollReveal>
   )
 }
 
@@ -301,6 +438,30 @@ function themeToCssVars(theme) {
 function deriveReadingPath(children) {
   const sections = collectSections(children).filter((item) => item.title)
   return sections.slice(0, 3)
+}
+
+function deriveTrustItems(metrics, spotlight) {
+  const metricItems = metrics.slice(0, 2).map((item) => ({
+    value: item.value,
+    label: item.label,
+  }))
+  const spotlightItems = (spotlight ?? []).slice(0, 1).map((item) => ({
+    value: item.title,
+    label: item.text,
+  }))
+
+  return [...metricItems, ...spotlightItems].slice(0, 3)
+}
+
+function getRevealVariant({ eyebrow = '', title = '', className = '' }) {
+  const variantPool = ['up', 'left', 'up', 'right', 'up', 'top']
+  const seed = `${eyebrow}|${title}|${className}`
+  const hash = Array.from(seed).reduce(
+    (total, char) => total + char.charCodeAt(0),
+    0,
+  )
+
+  return variantPool[hash % variantPool.length]
 }
 
 function collectSections(children, parentId = null, sections = []) {

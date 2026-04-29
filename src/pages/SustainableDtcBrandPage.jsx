@@ -9,6 +9,7 @@ import {
   ShowcaseGrid,
   StepsGrid,
 } from '../components/landing/Primitives.jsx'
+import { CountUpText } from '../components/landing/CountUpText'
 import { SustainableVisual } from '../components/landing/HeroVisuals.jsx'
 
 const theme = {
@@ -478,19 +479,19 @@ function SustainableDtcBrandPage() {
 
             <div className="impact-bar">
               <article>
-                <strong>48%</strong>
+                <strong><CountUpText value="48%" /></strong>
                 <p className="card-text">
                   lower outbound package volume after customers move from starter sets to refill shipments
                 </p>
               </article>
               <article>
-                <strong>3x</strong>
+                <strong><CountUpText value="3x" /></strong>
                 <p className="card-text">
                   average vessel reuse within the first subscription year across core products
                 </p>
               </article>
               <article>
-                <strong>1 page</strong>
+                <strong><CountUpText value="1 page" /></strong>
                 <p className="card-text">
                   simple public impact summary that keeps the brand transparent without overcomplicating the story
                 </p>
