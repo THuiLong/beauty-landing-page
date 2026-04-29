@@ -1,4 +1,5 @@
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { JumpToTopButton, ScrollReveal } from './landing/Primitives.jsx'
 
 function PageChip({ page, index }) {
@@ -24,6 +25,7 @@ function PageChip({ page, index }) {
 export function SiteLayout({ pages }) {
   return (
     <>
+      <RouteScrollReset />
       <div className="site-shell">
         <header className="site-header">
           <div className="site-header__inner site-header__bar">
@@ -63,6 +65,16 @@ export function SiteLayout({ pages }) {
       <JumpToTopButton />
     </>
   )
+}
+
+function RouteScrollReset() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
+  return null
 }
 
 export function DemoHome({ pages }) {
