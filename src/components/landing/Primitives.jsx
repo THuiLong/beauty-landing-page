@@ -140,7 +140,7 @@ export function JumpToTopButton({
     const scrollRoot = document.documentElement
     const maxScroll = Math.max(scrollRoot.scrollHeight - window.innerHeight, 0)
 
-    return maxScroll > 0 && window.scrollY >= maxScroll / 2
+    return maxScroll > 0 && window.scrollY >= maxScroll * 0.2
   }
 
   const [isVisible, setIsVisible] = useState(getIsVisible)
