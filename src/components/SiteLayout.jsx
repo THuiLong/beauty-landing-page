@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { JumpToTopButton, ScrollReveal } from './landing/Primitives.jsx'
 
@@ -23,6 +23,27 @@ function PageChip({ page, index }) {
 }
 
 export function SiteLayout({ pages }) {
+  const { pathname } = useLocation()
+  const switcherRef = useRef(null)
+  const currentPage = pages.find((page) => pathname === `/${page.slug}`) ?? null
+  const conceptCount = pages.length
+
+  useEffect(() => {
+    const activeChip = switcherRef.current?.querySelector('.page-chip.is-active')
+
+    if (!activeChip) {
+      return
+    }
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    activeChip.scrollIntoView({
+      block: 'nearest',
+      inline: 'center',
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+    })
+  }, [pathname])
+
   return (
     <>
       <RouteScrollReset />
@@ -34,7 +55,7 @@ export function SiteLayout({ pages }) {
               <span className="brand-lockup__name">Beauty Landing Page Studio</span>
             </Link>
             <div className="site-header__note">
-              Ten switchable, sale-ready landing page concepts built for hot niches:
+              {conceptCount} switchable, sale-ready landing page concepts built for hot niches:
               premium service brands, wellness products, local businesses, and AI offers.
             </div>
           </div>
@@ -44,10 +65,18 @@ export function SiteLayout({ pages }) {
           <div className="site-header__inner">
             <div className="page-switcher-shell">
               <div className="page-switcher__intro">
-                <div className="page-switcher__eyebrow">Explore Concepts</div>
-                <p>Jump between niches with a cleaner, more visual selector.</p>
+                <div className="page-switcher__intro-copy">
+                  <div className="page-switcher__eyebrow">Explore Concepts</div>
+                  <p>Jump between niches with a cleaner, more visual selector.</p>
+                </div>
+                <div className="page-switcher__current" aria-live="polite">
+                  <span className="page-switcher__current-label">
+                    {currentPage ? 'Current concept' : 'Current view'}
+                  </span>
+                  <strong>{currentPage?.name ?? 'Portfolio overview'}</strong>
+                </div>
               </div>
-              <nav className="page-switcher" aria-label="Landing page switcher">
+              <nav className="page-switcher" aria-label="Landing page switcher" ref={switcherRef}>
                 {pages.map((page, index) => (
                   <PageChip key={page.slug} page={page} index={index} />
                 ))}
@@ -78,13 +107,15 @@ function RouteScrollReset() {
 }
 
 export function DemoHome({ pages }) {
+  const conceptCount = pages.length
+
   return (
     <>
       <ScrollReveal as="section" className="home-hero" variant="top">
         <div className="home-hero__grid">
           <div>
             <div className="page-eyebrow">Portfolio Collection</div>
-            <h1>Ten different landing page concepts, one switchable showcase.</h1>
+            <h1>{conceptCount} different landing page concepts, one switchable showcase.</h1>
             <p>
               Each concept is designed to feel attractive, responsive, modern, and easy
               to sell to real clients. Use the menu to switch pages or start from any
@@ -103,7 +134,7 @@ export function DemoHome({ pages }) {
           <aside className="home-summary">
             <div className="home-summary__card">
               <div className="card-eyebrow">Built For Selling</div>
-              <div className="home-summary__metric">10</div>
+              <div className="home-summary__metric">{conceptCount}</div>
               <p>Distinct demo pages across local service, wellness, tech, and DTC niches.</p>
             </div>
             <div className="home-summary__card">
@@ -117,7 +148,7 @@ export function DemoHome({ pages }) {
         </div>
       </ScrollReveal>
 
-      <ScrollReveal as="section" id="demo-grid" className="home-grid" delay={90} variant="up">
+      <section id="demo-grid" className="home-grid">
         {pages.map((page) => (
           <Link
             key={page.slug}
@@ -136,7 +167,7 @@ export function DemoHome({ pages }) {
             </div>
           </Link>
         ))}
-      </ScrollReveal>
+      </section>
     </>
   )
 }
